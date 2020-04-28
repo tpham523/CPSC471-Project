@@ -12,10 +12,10 @@ Group Members:
 
 # Run Guide:
 1. Server Side: 
-    python3 server/server.py <PORT NUMBER>
+    python3 server/server.py '<PORT NUMBER>'
 
 2. Client Side:
-    python3 client/client.py <SERVER ADDRESS> <PORT NUMBER>
+    python3 client/client.py '<SERVER ADDRESS>' '<PORT NUMBER>'
 
 3. Commands:
 
