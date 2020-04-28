@@ -7,31 +7,31 @@ Group Members:
 3. 
 4. 
 
-Language: 
+# Language: 
 - Python
 
-Run Guide:
+# Run Guide:
 1. Server Side: 
-    python3 Server/server.py <PORT NUMBER>
+    python3 server/server.py <PORT NUMBER>
 
 2. Client Side:
-    python3 Client/client.py <SERVER ADDRESS> <PORT NUMBER>
+    python3 client/client.py <SERVER ADDRESS> <PORT NUMBER>
 
 3. Commands:
 
 --
 To download a file from server to client
-> >ftp get <FILE NAME>
+> ftp> get <FILE NAME>
 
 --
 To upload a file from client to server
-> >ftp put <FILE NAME>
+> ftp> put <FILE NAME>
 
 --
 To list all files located on server
-> >ftp ls 
+> ftp> ls 
 
 --
 To disconnect from the server and exits
-> >ftp quit
+> ftp> quit
 
