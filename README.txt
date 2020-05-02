@@ -4,8 +4,8 @@
 Group Members:
 1. Kiet Dang kdang53@csu.fullerton.edu
 2. Emily Pham tpham523@csu.fullerton.edu
-3. 
-4. 
+3. Erick Juarez Juarez.erick16@csu.fullerton.edu
+4. Jessica Vargas mvrgsj@csu.fullerton.edu 
 
 # Language: 
 - Python
