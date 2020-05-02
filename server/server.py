@@ -97,7 +97,7 @@ while True:
                 dataSize = len(fileData)
 
                 # Initialize number of bytes sent
-                bytesSent = 0
+                bytesSent = 0                
                 sendAll(clientControlSock,"FILE FOUND".encode())
                 # Keep sending until all is sent
                 while bytesSent < dataSize:
@@ -125,14 +125,14 @@ while True:
 
                 # The file has been read. We are done
                 # Close the file
-                fileObj.close()
-                sendAll(clientControlSock,str(dataSize).encode())
-                controlMessage = recvAll(clientControlSock, 7)
-                testString = controlMessage.strip()
-                if testString == b'SUCCESS':
+                fileObj.close()                
+                controlMessage = clientControlSock.recv(10) # assume that file is not larger than 9.9GB                
+                bytesTransfered = int(controlMessage.decode())
+            
+                if dataSize == bytesTransfered:
                     print("File '", nameFileGet.decode().strip(), "' is sent to client! - SUCCESS!\n")
                 else:
-                    print("File '", nameFileGet.decode().strip(), "' cannot be completely sent to client! - FAILURE!\n")
+                    print("File '", nameFileGet.decode().strip(), "' cannot be completely sent to client! - FAILURE!\n")                                    
             except FileNotFoundError:
                 print("File '", nameFileGet.decode().strip(), "' not found! - FAILURE\n")
                 sendAll(clientControlSock,"FILE NOT FOUND".encode())   #find not found from server
@@ -145,9 +145,8 @@ while True:
             serverDataSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             print("Try to connect to client socket: ", clientSideSockIP, " Port: ", clientSideSockPort, "\n")
             # Connect to the client
-            serverDataSock.connect((clientSideSockIP, clientSideSockPort))
-
-            controlMessage = clientControlSock.recv(20) #FILE NOT FOUND | FIND FOUND 
+            serverDataSock.connect((clientSideSockIP, clientSideSockPort))            
+            controlMessage = clientControlSock.recv(14) #FILE NOT FOUND | FIND FOUND                        
             testString = controlMessage.strip()
             if testString == b'FILE NOT FOUND':
                 print("File not found! - FAILURE\n") 
@@ -188,17 +187,18 @@ while True:
                 # check if it is last chunk
                 if chunkSize < 65536:
                     # print("File '", nameFileGet.decode().strip(), "' is received from client! - SUCCESS!\n")
-                    break;
-            serverDataSock.close()   
-
-             # check if file is received successfully
-            controlMessage = clientControlSock.recv(10) # assume that file is not larger than 9.9GB
+                    break;              
+            serverDataSock.close()            
+            sendAll(clientControlSock,str(bytesReceived).encode())
+             # check if file is received successfully            
+            controlMessage = clientControlSock.recv(10) # assume that file is not larger than 9.9GB            
             testInt = int(controlMessage.decode())
             if testInt == bytesReceived:
                 print("File '", nameFileGet.decode().strip(), "' is received from client! - SUCCESS!\n")
             else:
                 print("File '", nameFileGet.decode().strip(), "' cannot be completely received from client! - FAILURE!\n")
-            sendAll(clientControlSock,str(bytesReceived).encode())
+            
+            
         elif testString[5:7] == b'ls':
             # nameFileGet = testString[9:]
             clientSideSockPort = int(testString[0:5])
