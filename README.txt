@@ -12,13 +12,13 @@ Group Members:
 
 # Run Guide:
 
-1. Server Side: 
+1. Server Side: Inside the folder "Server" of project, open a terminal: 
 
-   python3 server/server.py \<PORT NUMBER>
+    python3 server.py <PORT NUMBER>
 
-2. Client Side:
+2. Client Side: Inside the folder "Client" of project, open a terminal: 
 
-    python3 client/client.py \<SERVER ADDRESS> \<PORT NUMBER>
+    python3 client.py <SERVER ADDRESS> <PORT NUMBER>
 
 3. Commands:
 
