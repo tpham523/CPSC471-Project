@@ -96,7 +96,6 @@ while True:
         # Start listening on the socket (client side)
         clientSideSock.listen(1)
 
-        # abc1 
         # make sure port length is 5
         if clientSideSockPort < 100:
             command += "000" + str(clientSideSockPort) + command
@@ -144,7 +143,7 @@ while True:
             chunkData = recvAll(serverDataSock, chunkSize)
 
             # Open the file and write the data to it >> save the received buffer
-            if bytesReceived <= 65536:          # 1st chunk
+            if bytesReceived <= 65536:          # 1st chunk, in case file size is too small
                 file = open(saveFileName, 'wb') # create file and write
             else:
                 file = open(saveFileName, 'ab') # append
@@ -156,18 +155,11 @@ while True:
             # check if file is sent
             if chunkSize < 65536:
                 break;
-        clientSideSock.close()
-        if bytesReceived != 0:
-            print("Filename is ", saveFileName)
-            print("Number of bytes transferred are ", bytesReceived, "bytes\n")
-
-            # check to send success signal to server
-            controlMessage = serverControlSock.recv(10) # assume that file is not larger than 9.9GB
-            testInt = int(controlMessage.decode())
-            if testInt == bytesReceived:
-                sendAll(serverControlSock,"SUCCESS".encode())
-            else:
-                sendAll(serverControlSock,"FAILURE".encode())
+        clientSideSock.close()        
+        sendAll(serverControlSock,str(bytesReceived).encode())        
+        print("Filename is ", saveFileName)
+        print("Number of bytes transferred are ", bytesReceived, "bytes\n")
+                
     elif command[0:3] == "put":
         nameFileGet = command[4:]
         # Create a socket
@@ -187,21 +179,20 @@ while True:
         elif clientSideSockPort < 10000:
             command = "0" + str(clientSideSockPort) + command
         else:
-            command = str(clientSideSockPort) + command
-        sendAll(serverControlSock, transformControlMessage(command))
-
+            command = str(clientSideSockPort) + command        
+        sendAll(serverControlSock, transformControlMessage(command))        
         # Accept connections
         serverDataSock, addr = clientSideSock.accept()
         
         try:
-            # Open the file
-            fileObj = open(nameFileGet, "rb")
+            # Open the file            
+            fileObj = open(nameFileGet, "rb")            
             # The file data
-            fileData = fileObj.read()
+            fileData = fileObj.read()            
             dataSize = len(fileData)
             # Initialize number of bytes sent
-            bytesSent = 0
-            sendAll(serverControlSock,"FILE FOUND".encode())
+            bytesSent = 0                    
+            sendAll(serverControlSock,"FILE FOUND    ".encode())            
             # Keep sending until all is sent
             while bytesSent < dataSize:
                 # Read 65536 bytes of data
@@ -223,23 +214,22 @@ while True:
                 # Prepend the size of the data to the
                 # file data.
                 fileDataChunk = dataSizeChunk.encode() + fileDataChunk
-
+                
                 sendAll(serverDataSock, fileDataChunk)
 
             # Close the file
             fileObj.close()
             # Get filename
-            saveFileName = command[9:].strip()
-            sendAll(serverControlSock,str(dataSize).encode())
-            controlMessage = serverControlSock.recv(10) # assume that file is not larger than 9.9GB
+            saveFileName = command[9:].strip()            
+            controlMessage = serverControlSock.recv(10) # assume that file is not larger than 9.9GB            
             bytesTransfered = int(controlMessage.decode())
             print("Filename is ", saveFileName)
             print("Number of bytes transferred are ", bytesTransfered, "bytes\n")
+            sendAll(serverControlSock,str(dataSize).encode())
             
         except FileNotFoundError:
-            print("File '", nameFileGet, "' not found!")
-            # sendAll(serverDataSock, "0000000000".encode())   #find not found from client
-            sendAll(serverControlSock,"FILE NOT FOUND".encode())   #find not found from client
+            print("File '", nameFileGet, "' not found!")                
+            sendAll(serverControlSock,"FILE NOT FOUND".encode())   #find not found from client            
         clientSideSock.close()
     elif command[0:2] == "ls":
         # Create a socket
@@ -302,7 +292,3 @@ while True:
         print("We only support 'get, put, ls, quit' commands")
 # Close the socket
 serverControlSock.close()
-
-
-
-
